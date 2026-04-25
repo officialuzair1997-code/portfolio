@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Code, Smartphone, Pen, Puzzle, Cloud, Settings } from "lucide-react";
 
 const services = [
@@ -43,6 +44,7 @@ const bottomServices = [
 ];
 
 const Services = () => {
+  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
@@ -95,7 +97,7 @@ const Services = () => {
   return (
     <section
       ref={sectionRef}
-      className="bg-gradient-to-br from-blue-900 via-slate-900 to-black py-24 px-6 overflow-hidden"
+      className="bg-[#020817] bg-gradient-to-br from-slate-950 via-[#06091f] to-indigo-950 py-24 px-6 overflow-hidden"
     >
       <div className="max-w-6xl mx-auto">
         {/* Header Animation */}
@@ -143,7 +145,10 @@ const Services = () => {
           className={`flex justify-center mt-16 transition-all duration-1000 delay-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
         >
-          <button className="group relative flex items-center gap-3 px-8 py-4 rounded-full bg-white text-black font-bold overflow-hidden transition-all hover:pr-12">
+          <button 
+            onClick={() => navigate("/all-services")}
+            className="group relative flex items-center gap-3 px-8 py-4 rounded-full bg-white text-black font-bold overflow-hidden transition-all hover:pr-12"
+          >
             <span className="relative z-10">Explore All Services</span>
             <Settings className="relative z-10 w-5 h-5 group-hover:rotate-180 transition-transform duration-700" />
             <div className="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>

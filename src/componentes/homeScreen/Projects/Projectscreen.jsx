@@ -160,9 +160,9 @@ const Projectscreen = ({ projects }) => {
     <section
       ref={sectionRef}
       id="projects"
-      className={`py-20 bg-gradient-to-br from-blue-900 via-slate-900 to-black transition-all duration-1000 ease-in-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-        }`}
+      className="py-20 bg-[#020817] bg-gradient-to-br from-slate-950 via-[#06091f] to-indigo-950"
     >
+      <div className={`transition-all duration-1000 ease-in-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-white mb-4">
@@ -189,6 +189,7 @@ const Projectscreen = ({ projects }) => {
             />
           ))}
         </div>
+      </div>
       </div>
     </section>
   );

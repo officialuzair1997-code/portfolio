@@ -1,52 +1,90 @@
-import React, { useEffect } from "react";
-import { Github, ExternalLink, Globe, CheckCircle2, Layout, Zap, Smartphone, Server } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  ExternalLink,
+  Globe,
+  CheckCircle2,
+  Layout,
+  Zap,
+  Server,
+  ArrowLeft,
+  Database,
+  Flame,
+} from "lucide-react";
+
+import Lightbox from "react-image-lightbox";
+import "react-image-lightbox/style.css";
+
+import { townmisProjectsData } from "../../data/townmis-projects";
+
+const iconMap = {
+  frontend: <Layout className="w-5 h-5 text-blue-400" />,
+  state: <Zap className="w-5 h-5 text-purple-400" />,
+  backend: <Server className="w-5 h-5 text-green-400" />,
+  database: <Database className="w-5 h-5 text-emerald-400" />,
+  ui: <Layout className="w-5 h-5 text-sky-400" />,
+  realtime: <Flame className="w-5 h-5 text-orange-400" />,
+};
 
 const ProjectDetail = () => {
-  // Scroll to top on mount
+  const navigate = useNavigate();
+  const { projectId } = useParams();
+  const [isOpen, setIsOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+
+  // Case-insensitive lookup
+  const project = townmisProjectsData[projectId?.toLowerCase()];
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [projectId]);
 
-  const projectData = {
-    title: "WatchMate",
-    tags: ["Social", "Streaming"],
-    githubUrl: "https://github.com",
-    liveUrl: "https://watchmate-example.com",
-    bannerImage: "https://res.cloudinary.com/dzt8b3mre/image/upload/v1740141380/vlv_m0o7p2.png",
-    intro: "WatchMate is a self-hosted watch party application that lets you upload, stream, and sync videos with friends in real time. It's built for seamless, couple-friendly streaming with zero distractions or ads.",
-    description: "WatchMate is a self-hosted watch-party platform that empowers you to upload, stream, and synchronize video playback with friends, all while chatting in real-time. Designed for a distraction-free, intimate experience, WatchMate supports private hosting, video sync, and chat features that keep everyone engaged.",
-    techStack: [
-      { name: "React", icon: <Layout className="w-5 h-5 text-blue-400" /> },
-      { name: "Node.js", icon: <Server className="w-5 h-5 text-green-400" /> },
-      { name: "Socket.io", icon: <Zap className="w-5 h-5 text-yellow-400" /> },
-      { name: "Cloudflare R2", icon: <Globe className="w-5 h-5 text-cyan-400" /> },
-      { name: "Tailwind CSS", icon: <Globe className="w-5 h-5 text-sky-400" /> },
-    ],
-    features: [
-      { title: "File Upload", desc: "Local upload of videos (up to 2 GB) or download via YouTube/direct links." },
-      { title: "Visibility Options", desc: "Public (shared with the whole platform), or Private (restricted access via direct link)." },
-      { title: "Streaming", desc: "Smooth playback served directly from Cloudflare R2." },
-      { title: "Watch Party", desc: "Instant room creation via shared link, friends join and stream in sync." },
-      { title: "Synchronization Controls", desc: "Playback managed by the host (play, pause, seek, speed control) ensuring all viewers stay perfectly synced." },
-      { title: "In-Party Chat", desc: "Chat while watching, reply to messages, send reactions, and share images." },
-      { title: "Outside-Party Chat", desc: "One-on-one messaging." },
-    ],
-  };
+  if (!project) {
+    return (
+      <div className="min-h-screen bg-[#020817] flex items-center justify-center text-white">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Project Not Found</h2>
+          <button
+            onClick={() => navigate("/")}
+            className="text-blue-400 hover:underline"
+          >
+            Go Back Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#050a18] text-white pt-24 pb-20 animate-fade-in font-sans selection:bg-blue-500/30">
-      <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16">
-          <div className="space-y-4">
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-white drop-shadow-2xl">
-              {projectData.title}
+    <div className="min-h-screen bg-[#020817] bg-gradient-to-br from-slate-950 via-[#06091f] to-indigo-950 text-white pt-10 pb-20 font-sans">
+      {/* Glow blobs */}
+      <div className="fixed top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="fixed bottom-1/4 right-1/4 w-80 h-80 bg-blue-700/10 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-colors duration-200 mb-8 group"
+        >
+          <ArrowLeft
+            size={18}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
+          Back to Projects
+        </button>
+
+        {/* ── Header ── */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10">
+          <div>
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white mb-3">
+              {project.title}
             </h1>
-            <div className="flex flex-wrap gap-3">
-              {projectData.tags.map((tag) => (
+            <div className="flex flex-wrap gap-2">
+              {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-5 py-2 rounded-full bg-blue-600/10 border border-blue-500/20 text-blue-400 text-sm font-bold backdrop-blur-xl shadow-inner"
+                  className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 text-xs font-semibold"
                 >
                   {tag}
                 </span>
@@ -54,88 +92,101 @@ const ProjectDetail = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 flex-shrink-0">
             <a
-              href={projectData.githubUrl}
+              href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 group shadow-2xl"
-              title="View Source on GitHub"
+              className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-sm transition-all duration-200 shadow-lg shadow-indigo-500/30 hover:scale-105 active:scale-95"
             >
-              <Github className="w-6 h-6 text-gray-400 group-hover:text-white" />
-            </a>
-            <a
-              href={projectData.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold transition-all duration-300 flex items-center gap-3 shadow-xl shadow-blue-600/30 active:scale-95"
-            >
-              Launch App <ExternalLink className="w-5 h-5" />
+              Live Demo <ExternalLink className="w-4 h-4" />
             </a>
           </div>
         </div>
 
-        {/* Banner Image Section */}
-        <div className="relative rounded-[3rem] overflow-hidden border border-white/10 bg-white/5 mb-24 shadow-[0_20px_50px_rgba(0,0,0,0.5)] group ring-1 ring-white/10">
+        {/* ── Banner ── */}
+        <div
+          className="rounded-2xl overflow-hidden border border-white/10 mb-14 shadow-2xl group cursor-zoom-in"
+          onClick={() => {
+            setPhotoIndex(0);
+            setIsOpen(true);
+          }}
+        >
           <img
-            src={projectData.bannerImage}
-            alt="WatchMate Banner"
-            className="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-[1.03]"
+            src={project.bannerImage}
+            alt={project.title}
+            className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-[1.02]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050a18] via-transparent to-transparent opacity-70"></div>
         </div>
 
-        {/* Project Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 lg:gap-24 items-start">
-          {/* Left Column: Intro, Description & Features */}
-          <div className="lg:col-span-2 space-y-24">
-            {/* Intro */}
-            <section className="animate-fade-in-up">
-              <h2 className="text-3xl font-black mb-8 text-white tracking-tight flex items-center gap-4">
-                <span className="w-1.5 h-8 bg-blue-500 rounded-full"></span>
-                Intro
-              </h2>
-              <div className="p-8 rounded-[2rem] bg-white/[0.02] border border-white/5 backdrop-blur-sm">
-                <p className="text-gray-300 text-xl leading-relaxed font-medium">
-                  {projectData.intro}
+        {/* ── Gallery Section ── */}
+        <section className="mb-20">
+          <SectionTitle>Project Gallery</SectionTitle>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {project.gallery.map((item, index) => (
+              <div
+                key={index}
+                className="space-y-3 group cursor-zoom-in"
+                onClick={() => {
+                  setPhotoIndex(index);
+                  setIsOpen(true);
+                }}
+              >
+                <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-xl transition-all duration-500 group-hover:border-indigo-500/30 bg-slate-900/50">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                    <span className="text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-4 group-hover:translate-y-0">
+                      View Fullscreen
+                    </span>
+                  </div>
+                </div>
+                <p className="text-sm font-semibold text-slate-400 group-hover:text-white transition-colors pl-1">
+                  {item.title}
                 </p>
               </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Content Grid ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-12">
+            <section>
+              <SectionTitle>Overview</SectionTitle>
+              <p className="text-slate-300 text-lg leading-relaxed">
+                {project.intro}
+              </p>
             </section>
 
-            {/* Description */}
-            <section className="animate-fade-in-up">
-              <h2 className="text-3xl font-black mb-8 text-white tracking-tight flex items-center gap-4">
-                <span className="w-1.5 h-8 bg-blue-500 rounded-full"></span>
-                Description
-              </h2>
-              <div className="space-y-8">
-                <p className="text-gray-400 text-lg leading-relaxed">
-                  {projectData.description}
-                </p>
-              </div>
+            <section>
+              <SectionTitle>Technical Architecture</SectionTitle>
+              <p className="text-slate-400 leading-relaxed text-base">
+                {project.description}
+              </p>
             </section>
 
-            {/* Key Features */}
-            <section className="animate-fade-in-up">
-              <h2 className="text-3xl font-black mb-10 text-white tracking-tight flex items-center gap-4">
-                <span className="w-1.5 h-8 bg-blue-500 rounded-full"></span>
-                Key Features
-              </h2>
-              <div className="grid grid-cols-1 gap-6">
-                {projectData.features.map((feature, index) => (
+            <section>
+              <SectionTitle>Key Deliverables</SectionTitle>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {project.features.map((f, i) => (
                   <div
-                    key={index}
-                    className="flex items-start gap-6 p-8 rounded-[2rem] bg-white/[0.03] border border-white/10 hover:border-blue-500/40 transition-all duration-500 group hover:bg-white/[0.06] hover:shadow-2xl hover:shadow-blue-500/5"
+                    key={i}
+                    className="flex items-start gap-4 p-5 rounded-xl bg-white/[0.03] border border-white/8 hover:border-indigo-500/40 hover:bg-white/[0.05] transition-all duration-300 group"
                   >
-                    <div className="p-3 rounded-2xl bg-blue-600/10 text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 shadow-inner">
-                      <CheckCircle2 className="w-6 h-6 flex-shrink-0" />
+                    <div className="mt-0.5 p-2 rounded-lg bg-indigo-600/10 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                      <CheckCircle2 className="w-4 h-4" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
-                        {feature.title}
+                      <h3 className="text-sm font-bold text-white mb-1 group-hover:text-indigo-300 transition-colors">
+                        {f.title}
                       </h3>
-                      <p className="text-gray-400 leading-relaxed text-lg">
-                        {feature.desc}
+                      <p className="text-slate-400 text-sm leading-relaxed">
+                        {f.desc}
                       </p>
                     </div>
                   </div>
@@ -144,46 +195,103 @@ const ProjectDetail = () => {
             </section>
           </div>
 
-          {/* Right Column: Tech Stack */}
-          <div className="sticky top-32 space-y-10 animate-fade-in">
-            <section className="p-10 rounded-[3rem] bg-gradient-to-b from-white/[0.05] to-transparent border border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden relative group">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/20 blur-[80px] rounded-full -mr-16 -mt-16 group-hover:bg-blue-500/30 transition-all duration-1000"></div>
-              <h2 className="text-2xl font-black mb-10 relative z-10 tracking-widest uppercase text-white/50 text-sm">
-                Tech Stack
-              </h2>
-              <div className="flex flex-col gap-6 relative z-10">
-                {projectData.techStack.map((tech) => (
+          {/* Right Column */}
+          <div className="space-y-8 lg:sticky lg:top-24 self-start">
+            <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-md shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-indigo-500/20 transition-colors" />
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-500 mb-6 flex items-center gap-2">
+                <span className="w-8 h-[1px] bg-indigo-500" />
+                Technology Stack
+              </p>
+              <div className="flex flex-col gap-5">
+                {project.techStack.map((tech) => (
                   <div
                     key={tech.name}
-                    className="flex items-center gap-6 group/item"
+                    className="flex items-center gap-4 group/t"
                   >
-                    <div className="w-14 h-14 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/10 group-hover/item:border-blue-500/50 group-hover/item:bg-blue-500/10 transition-all duration-500 shadow-xl">
-                      {tech.icon}
+                    <div className="w-12 h-12 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center group-hover/t:border-indigo-500/50 group-hover/t:bg-indigo-500/10 group-hover/t:shadow-[0_0_20px_rgba(99,102,241,0.2)] transition-all duration-300">
+                      {iconMap[tech.type] || (
+                        <Layout className="w-5 h-5 text-gray-400" />
+                      )}
                     </div>
-                    <span className="text-gray-300 font-bold text-lg group-hover/item:text-white transition-colors duration-300">
-                      {tech.name}
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-white font-bold text-sm tracking-tight group-hover/t:text-indigo-300 transition-colors">
+                        {tech.name}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">
+                        Expertise level
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
-            </section>
+            </div>
 
-            {/* Quick Status */}
-            <div className="p-10 rounded-[3rem] bg-gradient-to-br from-blue-600/20 to-indigo-600/10 border border-blue-500/20 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
-              <div className="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-              <h3 className="font-black text-blue-400 mb-2 uppercase text-xs tracking-[0.3em] relative z-10">
-                Availability
-              </h3>
-              <p className="text-white text-3xl font-black relative z-10 drop-shadow-lg">
-                Production Ready
+            {/* Status Card */}
+            <div className="p-8 rounded-3xl bg-gradient-to-br from-indigo-900/40 to-violet-900/40 border border-indigo-500/30 backdrop-blur-sm shadow-xl">
+              <p className="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-2">
+                Project Status
               </p>
+              <p className="text-white text-2xl font-black italic tracking-tight">
+                PROFESSIONAL
+              </p>
+              <div className="h-1.5 w-full bg-slate-800 rounded-full mt-4 overflow-hidden">
+                <div className="h-full w-[95%] bg-gradient-to-r from-indigo-500 to-violet-500" />
+              </div>
+              <span className="inline-flex items-center gap-2 mt-4 text-[10px] font-bold text-green-400 uppercase tracking-tighter">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
+                Validated Architecture
+              </span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Lightbox Implementation */}
+      {isOpen && project?.gallery?.[photoIndex] && (
+        <Lightbox
+          mainSrc={project.gallery[photoIndex].image}
+          nextSrc={
+            project.gallery[(photoIndex + 1) % project.gallery.length].image
+          }
+          prevSrc={
+            project.gallery[
+              (photoIndex + project.gallery.length - 1) % project.gallery.length
+            ].image
+          }
+          onCloseRequest={() => setIsOpen(false)}
+          onMovePrevRequest={() =>
+            setPhotoIndex(
+              (photoIndex + project.gallery.length - 1) % project.gallery.length
+            )
+          }
+          onMoveNextRequest={() =>
+            setPhotoIndex((photoIndex + 1) % project.gallery.length)
+          }
+          imageTitle={project.gallery[photoIndex].title}
+          enableZoom={true}
+          animationDuration={300}
+          key={`${projectId}-${photoIndex}`}
+          loader={<div />}
+          onImageLoad={() => {
+            // Force a window resize event to trigger internal layout recalcs
+            window.dispatchEvent(new Event("resize"));
+          }}
+          reactModalStyle={{
+            overlay: { zIndex: 9999 },
+            content: { zIndex: 10000, background: "transparent" },
+          }}
+        />
+      )}
     </div>
   );
 };
 
-export default ProjectDetail;
+const SectionTitle = ({ children }) => (
+  <h2 className="flex items-center gap-3 text-2xl font-black text-white mb-6 uppercase tracking-wider">
+    <span className="w-2 h-6 bg-indigo-500 rounded-sm" />
+    {children}
+  </h2>
+);
 
+export default ProjectDetail;

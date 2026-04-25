@@ -1,78 +1,49 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Code2,
-  Smartphone,
-  Server,
-  Wrench,
-  Languages as LanguagesIcon,
-  Workflow as WorkflowIcon,
+import { useNavigate } from "react-router-dom";
+import { 
+  Database, 
+  Layout, 
+  Globe, 
+  Terminal,
+  ArrowRight
 } from "lucide-react";
 
-const skillsData = {
-  frontend: {
-    title: "Frontend",
-    icon: <Code2 className="text-blue-500" />,
-    color: "blue",
-    list: [
-      "TypeScript",
-      "Tailwind",
-      "JavaScript",
-      "Next.js",
-      "React",
-      "CSS3",
-      "HTML5",
-    ],
+const skillCategories = [
+  {
+    title: "Frontend Development",
+    icon: Layout,
+    color: "from-blue-600 to-cyan-500",
+    skills: ["React.js", "Next.js 14", "TypeScript", "Tailwind CSS", "Framer Motion"]
   },
-  mobile: {
-    title: "Mobile",
-    icon: <Smartphone className="text-green-500" />,
-    color: "green",
-    list: ["React Native", "Flutter", "Dart"],
+  {
+    title: "Backend Engine",
+    icon: Terminal,
+    color: "from-purple-600 to-indigo-500",
+    skills: ["Node.js", "Express.js", "Socket.io", "REST APIs", "Knex.js"]
   },
-  backend: {
-    title: "Backend",
-    icon: <Server className="text-purple-500" />,
-    color: "purple",
-    list: [
-      "PostgreSQL",
-      "Node.js",
-      "Git",
-      "Firebase",
-      "Express.js",
-      "MongoDB",
-      "MySQL",
-    ],
+  {
+    title: "Database & Cloud",
+    icon: Database,
+    color: "from-emerald-500 to-teal-400",
+    skills: ["MongoDB", "PostgreSQL", "Firebase", "Amazon S3", "Redis"]
   },
-  tools: {
-    title: "Tools",
-    icon: <Wrench className="text-yellow-500" />,
-    color: "yellow",
-    list: ["GitHub", "VS Code", "Figma", "Postman", "Docker", "AWS", "Jira"],
-  },
-  languages: {
-    title: "Languages",
-    icon: <LanguagesIcon className="text-red-500" />,
-    color: "red",
-    list: ["JavaScript", "TypeScript", "Python", "Java", "Dart"],
-  },
-  other: {
-    title: "Other",
-    icon: <WorkflowIcon className="text-pink-500" />,
-    color: "pink",
-    list: ["REST APIs", "GraphQL", "WebSockets", "Microservices", "CI/CD"],
-  },
-};
+  {
+    title: "Mobile Solution",
+    icon: Globe,
+    color: "from-orange-500 to-rose-500",
+    skills: ["Flutter", "Dart", "Firebase Auth", "State Management", "Native APIs"]
+  }
+];
 
-const Skills = () => {
+const Skils = () => {
+  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        if (entry.isIntersecting) setIsVisible(true);
       },
       { threshold: 0.1 }
     );
@@ -82,67 +53,54 @@ const Skills = () => {
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="min-h-screen bg-gradient-to-br from-blue-900 via-slate-900 to-black py-20 px-6 md:px-12 lg:px-24 overflow-hidden"
+    <section 
+      ref={sectionRef} 
+      className="bg-[#020817] py-24 px-6 relative overflow-hidden"
     >
-      <div className="max-w-6xl mx-auto">
-        {/* Title Animation */}
-        <h2
-          className={`text-4xl md:text-5xl font-bold mb-16 transition-all duration-700 ${isVisible
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 -translate-y-10"
-            }`}
-        >
-          <span className="text-white">My</span>
-          <span className="text-blue-500"> Skills</span>
-        </h2>
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+        <div className="absolute top-1/4 right-0 w-96 h-96 bg-blue-600 rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-indigo-600 rounded-full blur-[120px]" />
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Object.values(skillsData).map((category, index) => (
-            <div
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="text-center mb-16">
+          <h2 className={`text-4xl md:text-6xl font-black text-white mb-6 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
+            Technical <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Expertise</span>
+          </h2>
+          <div className={`w-24 h-1.5 bg-indigo-600 mx-auto rounded-full transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-0"}`} />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+          {skillCategories.map((category, index) => (
+            <div 
               key={index}
-              style={{ transitionDelay: `${index * 150}ms` }} // Staggered effect
-              className={`bg-slate-800/50 p-6 rounded-2xl border border-slate-700 backdrop-blur-sm shadow-xl 
-                hover:border-blue-500/50 hover:shadow-blue-500/10 transition-all duration-700 transform
-                ${isVisible
-                  ? "opacity-100 translate-y-0 scale-100"
-                  : "opacity-0 translate-y-20 scale-95"
-                }`}
+              style={{ transitionDelay: `${index * 150}ms` }}
+              className={`p-8 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-sm transition-all duration-700 hover:border-indigo-500/40 group ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
             >
-              <div className="flex items-center mb-6">
-                <div className="p-3 bg-slate-900 rounded-lg mr-4">
-                  {category.icon}
-                </div>
-                <h3 className="text-xl font-bold text-white">
-                  {category.title}
-                </h3>
+              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${category.color} flex items-center justify-center mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500`}>
+                <category.icon className="w-7 h-7 text-white" />
               </div>
-
-              <div className="flex flex-wrap gap-2">
-                {category.list.map((skill, sIndex) => (
-                  <span
-                    key={sIndex}
-                    className={`bg-${category.color}-500/10 text-${category.color}-400 border border-${category.color}-500/20 px-3 py-1 rounded-lg text-sm font-medium hover:bg-${category.color}-500 hover:text-white transition-colors duration-300`}
-                  >
+              <h3 className="text-xl font-bold text-white mb-6 tracking-tight">{category.title}</h3>
+              <ul className="space-y-4">
+                {category.skills.map((skill, si) => (
+                  <li key={si} className="flex items-center gap-3 text-slate-400 text-sm">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                     {skill}
-                  </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           ))}
         </div>
 
-        {/* Bottom Button Animation */}
-        <div
-          className={`flex justify-center mt-16 transition-all duration-1000 delay-1000 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-90"
-            }`}
-        >
-          <button className="relative group px-10 py-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold shadow-2xl transition-all hover:shadow-blue-500/40 hover:scale-105 active:scale-95">
-            <span className="relative z-10 flex items-center gap-2">
-              Explore More Expertise <Code2 size={20} />
-            </span>
-            <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+        <div className={`flex justify-center transition-all duration-1000 delay-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
+          <button 
+            onClick={() => navigate("/expertises")}
+            className="group flex items-center gap-4 px-10 py-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-all shadow-xl shadow-indigo-600/20 active:scale-95"
+          >
+            Explore More Expertise
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
           </button>
         </div>
       </div>
@@ -150,4 +108,4 @@ const Skills = () => {
   );
 };
 
-export default Skills;
+export default Skils;

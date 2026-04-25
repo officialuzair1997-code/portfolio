@@ -1,7 +1,6 @@
 import React from "react";
-import Footer from "../../../common/footer/Footer";
+
 import HeroSection from "../HeroSections/HeroSection";
-import Header from "../Header/Header";
 import About from "../about/About";
 import Skills from "../skils/Skils";
 import Services from "../services/Services";
@@ -11,9 +10,9 @@ const Home = () => {
   return (
     <>
       <div id="home">
-        <Header />
+        <HeroSection />
       </div>
-      <HeroSection />
+
       <div id="about">
         <About />
       </div>
@@ -29,7 +28,7 @@ const Home = () => {
       <div id="contact">
         <ContactPage />
       </div>
-      <Footer />
+
     </>
   );
 };

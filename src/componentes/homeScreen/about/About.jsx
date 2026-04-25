@@ -22,7 +22,7 @@ const About = () => {
   return (
     <section
       ref={domRef}
-      className="min-h-screen bg-gradient-to-br from-blue-900 via-slate-900 to-black py-20 px-6 md:px-12 lg:px-24 overflow-hidden"
+      className="min-h-screen bg-[#020817] bg-gradient-to-br from-slate-950 via-[#06091f] to-indigo-950 py-20 px-6 md:px-12 lg:px-24 overflow-hidden"
     >
       <div className="max-w-6xl mx-auto">
         {/* Title Animation */}

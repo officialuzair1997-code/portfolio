@@ -1,5 +1,7 @@
 import { Button, Input, Textarea } from "@material-tailwind/react";
 import React, { useState } from "react";
+import ConnectionModal from "../../../common/modal/ConnectionModal";
+import { sendWhatsAppMessage, sendEmailMessage } from "../../../pages/contact/contactService";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -10,6 +12,7 @@ export default function ContactPage() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Handle Input Changes
   const handleChange = (e) => {
@@ -20,21 +23,38 @@ export default function ContactPage() {
     }));
   };
 
-  // Handle Form Submission
-  const handleSubmit = async (e) => {
+  // Handle Form Submission (Trigger Modal)
+  const handleSubmit = (e) => {
     e.preventDefault();
+    setIsModalOpen(true);
+  };
+
+  // Handle actual option selection from Modal
+  const handleOptionSelect = async (option) => {
+    setIsModalOpen(false);
     setIsSubmitting(true);
 
-    // Simulate API Call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    console.log("Form submitted:", formData);
-    setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
-    setIsSubmitting(false);
+    if (option === "whatsapp") {
+      sendWhatsAppMessage(formData);
+      // Reset form after a delay to show success state
+      setTimeout(() => {
+        setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+        setIsSubmitting(false);
+      }, 1000);
+    } else if (option === "email") {
+      const result = await sendEmailMessage(formData);
+      if (result.success) {
+        alert("Email sent successfully!");
+        setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+      } else {
+        alert("Failed to send email. Please try WhatsApp.");
+      }
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-900 via-slate-900 to-black flex flex-col items-center justify-center p-4 text-white">
+    <main className="min-h-screen bg-[#020817] bg-gradient-to-br from-slate-950 via-[#06091f] to-indigo-950 flex flex-col items-center justify-center p-4 text-white">
       {/* Header Section */}
       <div className="w-full max-w-3xl text-center mb-16 animate-fade-in">
         <div className="inline-block mb-4 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-400/20 backdrop-blur-sm">
@@ -184,9 +204,9 @@ export default function ContactPage() {
               Or connect via social
             </p>
             <div className="flex justify-center gap-4">
-              <SocialLink href="#" icon="envelope" label="Email" />
-              <SocialLink href="#" icon="github" label="GitHub" />
-              <SocialLink href="#" icon="linkedin" label="LinkedIn" />
+              <SocialLink href="mailto:uzair@example.com" icon="envelope" label="Email" />
+              <SocialLink href="https://github.com" icon="github" label="GitHub" />
+              <SocialLink href="https://www.linkedin.com/in/muhammad-uzair-05921a365?utm_source=share_via&utm_content=profile&utm_medium=member_android" icon="linkedin" label="LinkedIn" />
               <SocialLink href="#" icon="twitter" label="Twitter" />
             </div>
           </div>
@@ -197,6 +217,13 @@ export default function ContactPage() {
         className="mt-16 text-center text-sm text-muted-foreground animate-fade-in"
         style={{ animationDelay: "0.2s" }}
       ></div>
+
+      <ConnectionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onOptionSelect={handleOptionSelect}
+        formData={formData}
+      />
     </main>
   );
 }

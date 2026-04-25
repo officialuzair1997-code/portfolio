@@ -31,7 +31,7 @@ const Footer = () => {
             <Github size={22} strokeWidth={1.5} />
           </a>
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/muhammad-uzair-05921a365?utm_source=share_via&utm_content=profile&utm_medium=member_android"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-white transition-all duration-300 hover:scale-110"

@@ -6,6 +6,9 @@ import path from "path";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()], // Force restart
+  define: {
+    global: 'window',
+  },
   resolve: {
     alias: {
       react: path.resolve(process.cwd(), "./node_modules/react"),
