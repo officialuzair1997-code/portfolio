@@ -6,7 +6,7 @@ import AppRoutes from "./AppRoutes";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
-import Loader from "./common/loader/loader";
+import Loader from "./common/loader/Loader";
 
 import { ThemeProvider } from "@material-tailwind/react";
 import ErrorBoundary from "./ErrorBoundary";
