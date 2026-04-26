@@ -20,34 +20,6 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            // Group core framework libraries
-            if (
-              id.includes("react") ||
-              id.includes("react-dom") ||
-              id.includes("react-router-dom") ||
-              id.includes("@reduxjs") ||
-              id.includes("redux")
-            ) {
-              return "framework";
-            }
-
-            // Group UI libraries and their direct dependencies
-            if (
-              id.includes("@material-tailwind") ||
-              id.includes("@floating-ui") ||
-              id.includes("framer-motion") ||
-              id.includes("clsx") ||
-              id.includes("tailwind-merge")
-            ) {
-              return "ui-kit";
-            }
-
-            // Group large utility libraries
-            if (id.includes("lucide-react")) {
-              return "icons";
-            }
-
-            // Everything else goes to vendor
             return "vendor";
           }
         },
