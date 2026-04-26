@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import profileImg from "../../../assets/my image/uzair_image.png";
 
 const About = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -79,8 +80,9 @@ const About = () => {
               <div className="absolute inset-0 rounded-full border-4 border-blue-500/30 bg-gradient-to-br from-blue-400/20 to-purple-600/20 animate-pulse"></div>
 
               <img
-                src="/images/a.jfif"
+                src={profileImg}
                 alt="Muhammad Uzair"
+                loading="lazy"
                 className="relative w-full h-full object-cover rounded-full border-4 border-blue-500 shadow-2xl hover:grayscale-0 transition-all duration-500"
               />
 

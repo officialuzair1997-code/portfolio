@@ -12,8 +12,11 @@ import {
   Flame,
 } from "lucide-react";
 
-import Lightbox from "react-image-lightbox";
-import "react-image-lightbox/style.css";
+import Lightbox from "yet-another-react-lightbox";
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
 
 import { townmisProjectsData } from "../../data/townmis-projects";
 
@@ -55,6 +58,13 @@ const ProjectDetail = () => {
     );
   }
 
+  // Map gallery images to lightbox slides
+  const slides = project.gallery?.map((item) => ({
+    src: item.image,
+    title: item.title,
+    description: item.title,
+  })) || [];
+
   return (
     <div className="min-h-screen bg-[#020817] bg-gradient-to-br from-slate-950 via-[#06091f] to-indigo-950 text-white pt-10 pb-20 font-sans">
       {/* Glow blobs */}
@@ -81,7 +91,7 @@ const ProjectDetail = () => {
               {project.title}
             </h1>
             <div className="flex flex-wrap gap-2">
-              {project.tags.map((tag) => (
+              {project.tags?.map((tag) => (
                 <span
                   key={tag}
                   className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 text-xs font-semibold"
@@ -115,6 +125,7 @@ const ProjectDetail = () => {
           <img
             src={project.bannerImage}
             alt={project.title}
+            loading="lazy"
             className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-[1.02]"
           />
         </div>
@@ -123,7 +134,7 @@ const ProjectDetail = () => {
         <section className="mb-20">
           <SectionTitle>Project Gallery</SectionTitle>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {project.gallery.map((item, index) => (
+            {project.gallery?.map((item, index) => (
               <div
                 key={index}
                 className="space-y-3 group cursor-zoom-in"
@@ -136,6 +147,7 @@ const ProjectDetail = () => {
                   <img
                     src={item.image}
                     alt={item.title}
+                    loading="lazy"
                     className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
@@ -173,7 +185,7 @@ const ProjectDetail = () => {
             <section>
               <SectionTitle>Key Deliverables</SectionTitle>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {project.features.map((f, i) => (
+                {project.features?.map((f, i) => (
                   <div
                     key={i}
                     className="flex items-start gap-4 p-5 rounded-xl bg-white/[0.03] border border-white/8 hover:border-indigo-500/40 hover:bg-white/[0.05] transition-all duration-300 group"
@@ -204,7 +216,7 @@ const ProjectDetail = () => {
                 Technology Stack
               </p>
               <div className="flex flex-col gap-5">
-                {project.techStack.map((tech) => (
+                {project.techStack?.map((tech) => (
                   <div
                     key={tech.name}
                     className="flex items-center gap-4 group/t"
@@ -248,41 +260,13 @@ const ProjectDetail = () => {
       </div>
 
       {/* Lightbox Implementation */}
-      {isOpen && project?.gallery?.[photoIndex] && (
-        <Lightbox
-          mainSrc={project.gallery[photoIndex].image}
-          nextSrc={
-            project.gallery[(photoIndex + 1) % project.gallery.length].image
-          }
-          prevSrc={
-            project.gallery[
-              (photoIndex + project.gallery.length - 1) % project.gallery.length
-            ].image
-          }
-          onCloseRequest={() => setIsOpen(false)}
-          onMovePrevRequest={() =>
-            setPhotoIndex(
-              (photoIndex + project.gallery.length - 1) % project.gallery.length
-            )
-          }
-          onMoveNextRequest={() =>
-            setPhotoIndex((photoIndex + 1) % project.gallery.length)
-          }
-          imageTitle={project.gallery[photoIndex].title}
-          enableZoom={true}
-          animationDuration={300}
-          key={`${projectId}-${photoIndex}`}
-          loader={<div />}
-          onImageLoad={() => {
-            // Force a window resize event to trigger internal layout recalcs
-            window.dispatchEvent(new Event("resize"));
-          }}
-          reactModalStyle={{
-            overlay: { zIndex: 9999 },
-            content: { zIndex: 10000, background: "transparent" },
-          }}
-        />
-      )}
+      <Lightbox
+        open={isOpen}
+        close={() => setIsOpen(false)}
+        index={photoIndex}
+        slides={slides}
+        plugins={[Thumbnails, Zoom]}
+      />
     </div>
   );
 };

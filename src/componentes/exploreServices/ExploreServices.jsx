@@ -27,7 +27,7 @@ const ExploreServices = () => {
         <div className="absolute bottom-0 -right-1/4 w-1/2 h-1/2 bg-blue-500/10 rounded-full blur-[120px]" />
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-12 lg:py-20 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12 pt-28 pb-12 lg:pt-36 lg:pb-20 relative z-10">
         {/* Navigation */}
         <button 
           onClick={() => navigate(-1)}
