@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import {
-  ChevronDown,
   Download,
   Mail,
   Github,
@@ -19,42 +19,57 @@ const roles = [
 
 const socialLinks = [
   {
-    icon: <Mail size={20} />,
+    icon: <Mail size={22} />,
     href: "mailto:uzair@example.com",
     label: "Email",
-    color: "hover:text-rose-400 hover:border-rose-400/50 hover:bg-rose-500/10",
+    color: "text-rose-400 border-rose-400/50 bg-rose-500/10",
   },
   {
-    icon: <Github size={20} />,
+    icon: <Github size={22} />,
     href: "https://github.com",
     label: "GitHub",
-    color: "hover:text-slate-200 hover:border-slate-400/50 hover:bg-slate-500/10",
+    color: "text-slate-200 border-slate-400/50 bg-slate-500/10",
   },
   {
-    icon: <Linkedin size={20} />,
+    icon: <Linkedin size={22} />,
     href: "https://www.linkedin.com/in/muhammad-uzair-05921a365?utm_source=share_via&utm_content=profile&utm_medium=member_android",
     label: "LinkedIn",
-    color: "hover:text-blue-400 hover:border-blue-400/50 hover:bg-blue-500/10",
+    color: "text-blue-400 border-blue-400/50 bg-blue-500/10",
   },
   {
-    icon: <Instagram size={20} />,
+    icon: <Instagram size={22} />,
     href: "https://instagram.com",
     label: "Instagram",
-    color: "hover:text-pink-400 hover:border-pink-400/50 hover:bg-pink-500/10",
+    color: "text-pink-400 border-pink-400/50 bg-pink-500/10",
   },
 ];
 
 const HeroSection = () => {
-  const [visible, setVisible] = useState(false);
   const [roleIndex, setRoleIndex] = useState(0);
   const [displayed, setDisplayed] = useState("");
   const [typing, setTyping] = useState(true);
 
-  // Fade-in on mount
+  // Mouse Parallax Setup
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { damping: 25, stiffness: 150 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  const parallaxX = useTransform(smoothX, [0, 1000], [-30, 30]);
+  const parallaxY = useTransform(smoothY, [0, 1000], [-30, 30]);
+  const parallaxXSlow = useTransform(smoothX, [0, 1000], [-15, 15]);
+  const parallaxYSlow = useTransform(smoothY, [0, 1000], [-15, 15]);
+
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 100);
-    return () => clearTimeout(t);
-  }, []);
+    const handleMouseMove = (e) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
 
   // Typewriter effect
   useEffect(() => {
@@ -67,7 +82,7 @@ const HeroSection = () => {
         );
         return () => clearTimeout(t);
       } else {
-        const t = setTimeout(() => setTyping(false), 1800);
+        const t = setTimeout(() => setTyping(false), 2000);
         return () => clearTimeout(t);
       }
     } else {
@@ -81,150 +96,185 @@ const HeroSection = () => {
     }
   }, [displayed, typing, roleIndex]);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+    },
+  };
+
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#020817]">
-      {/* ── Deep dark gradient base ── */}
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#020817] selection:bg-indigo-500/30">
+      {/* ── Background Depth Layers ── */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-[#06091f] to-indigo-950" />
+      
+      {/* Interactive Glowing Blobs */}
+      <motion.div 
+        style={{ x: parallaxXSlow, y: parallaxYSlow }}
+        className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" 
+      />
+      <motion.div 
+        style={{ x: parallaxX, y: parallaxY }}
+        className="absolute bottom-1/4 -right-20 w-[400px] h-[400px] bg-violet-700/10 rounded-full blur-[100px] pointer-events-none" 
+      />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.05)_0%,transparent_70%)] pointer-events-none" />
 
-      {/* ── Glowing radial blobs ── */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-700/15 rounded-full blur-[100px] animate-pulse delay-700" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-violet-700/10 rounded-full blur-[90px]" />
-
-      {/* ── Subtle grid overlay ── */}
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
+      <motion.div
+        style={{ x: parallaxXSlow, y: parallaxYSlow, 
           backgroundImage:
             "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }}
+        className="absolute inset-0 opacity-[0.05] pointer-events-none"
       />
 
       {/* ══════════════════════════════════════
-          LEFT SIDEBAR — Social Links
+          SIDEBAR — Social Links (Animated)
       ══════════════════════════════════════ */}
-      <div
-        className={`fixed left-0 top-0 h-full z-50 hidden md:flex flex-col items-center justify-center gap-3 px-4 transition-all duration-1000 delay-500 ${
-          visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
-        }`}
+      <motion.div
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 1, delay: 1, ease: "circOut" }}
+        className="fixed left-0 top-0 h-full z-50 hidden md:flex flex-col items-center justify-center gap-4 px-6"
       >
-        {/* Top line */}
-        <div className="w-px flex-1 max-h-32 bg-gradient-to-b from-transparent to-slate-700/60" />
-
-        {/* Icon buttons */}
+        <div className="w-px h-24 bg-gradient-to-b from-transparent to-slate-700/50" />
         {socialLinks.map((link, i) => (
-          <a
+          <motion.a
             key={i}
             href={link.href}
             target={link.href.startsWith("mailto") ? "_self" : "_blank"}
             rel="noopener noreferrer"
-            aria-label={link.label}
-            style={{ transitionDelay: `${600 + i * 80}ms` }}
-            className={`group relative w-10 h-10 flex items-center justify-center rounded-xl border border-slate-700/60 bg-slate-900/60 backdrop-blur-sm text-slate-400 transition-all duration-300 hover:scale-110 hover:-translate-y-0.5 ${link.color}`}
+            whileHover={{ scale: 1.2, x: 5 }}
+            whileTap={{ scale: 0.9 }}
+            className={`group relative w-12 h-12 flex items-center justify-center rounded-2xl border border-slate-700/40 bg-slate-900/40 backdrop-blur-md transition-all duration-300 ${link.color} shadow-lg shadow-black/20`}
           >
             {link.icon}
-            {/* Tooltip */}
-            <span className="absolute left-12 whitespace-nowrap bg-slate-800 text-slate-200 text-xs font-medium px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none border border-slate-700/50">
+            <span className="absolute left-16 whitespace-nowrap bg-slate-800 text-slate-200 text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none border border-slate-700 translate-x-2 group-hover:translate-x-0">
               {link.label}
             </span>
-          </a>
+          </motion.a>
         ))}
-
-        {/* Bottom line */}
-        <div className="w-px flex-1 max-h-32 bg-gradient-to-t from-transparent to-slate-700/60" />
-      </div>
-
-      {/* ══════════════════════════════════════
-          MOBILE BOTTOM BAR — Social Links
-      ══════════════════════════════════════ */}
-      <div
-        className={`fixed bottom-0 left-0 w-full z-50 flex md:hidden items-center justify-center gap-5 py-3 bg-slate-950/80 backdrop-blur-md border-t border-slate-800/60 transition-all duration-700 delay-700 ${
-          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-        }`}
-      >
-        {socialLinks.map((link, i) => (
-          <a
-            key={i}
-            href={link.href}
-            target={link.href.startsWith("mailto") ? "_self" : "_blank"}
-            rel="noopener noreferrer"
-            aria-label={link.label}
-            className={`w-9 h-9 flex items-center justify-center rounded-lg border border-slate-700/60 bg-slate-900/60 text-slate-400 transition-all duration-300 active:scale-95 ${link.color}`}
-          >
-            {link.icon}
-          </a>
-        ))}
-      </div>
+        <div className="w-px h-24 bg-gradient-to-t from-transparent to-slate-700/50" />
+      </motion.div>
 
       {/* ══════════════════════════════════════
           MAIN CONTENT
       ══════════════════════════════════════ */}
-      <div
-        className={`relative z-10 text-center px-6 md:px-12 transition-all duration-1000 ${
-          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-        }`}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative z-10 text-center px-6 max-w-4xl"
       >
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-sm font-medium px-4 py-1.5 rounded-full mb-8 backdrop-blur-sm">
-          <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping inline-block" />
-          Available for Work
-        </div>
-
-        {/* Name */}
-        <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-4 leading-tight tracking-tight">
-          Hi, I'm{" "}
-          <span className="bg-gradient-to-r from-indigo-400 via-blue-400 to-violet-400 bg-clip-text text-transparent">
-            Uzair
+        {/* Modern Label */}
+        <motion.div 
+          variants={itemVariants}
+          className="inline-flex items-center gap-3 bg-white/5 border border-white/10 text-indigo-300 text-xs font-bold uppercase tracking-[0.2em] px-5 py-2 rounded-full mb-10 backdrop-blur-md shadow-xl"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
           </span>
-        </h1>
+          Developing the Future
+        </motion.div>
 
-        {/* Typewriter role */}
-        <div className="h-10 flex items-center justify-center mb-6">
-          <span className="text-xl md:text-2xl font-semibold text-slate-300">
-            {displayed}
-            <span className="inline-block w-0.5 h-6 bg-indigo-400 ml-1 animate-pulse" />
+        {/* Hero Title */}
+        <motion.div variants={itemVariants} className="space-y-4">
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[0.95] tracking-tight">
+            Design. Code.<br />
+            <span className="bg-gradient-to-r from-indigo-500 via-blue-400 to-violet-500 bg-clip-text text-transparent">
+              Empower.
+            </span>
+          </h1>
+          <p className="text-xl md:text-2xl font-bold text-slate-500 uppercase tracking-widest mt-6">
+            Muhammad Uzair
+          </p>
+        </motion.div>
+
+        {/* Typewriter Refined */}
+        <motion.div variants={itemVariants} className="h-12 flex items-center justify-center my-8">
+          <span className="text-xl md:text-2xl font-semibold text-slate-400 flex items-center gap-2">
+            Experienced
+            <span className="text-white bg-indigo-600/20 px-3 py-1 rounded-lg border border-indigo-500/20">{displayed}</span>
+            <motion.span 
+              animate={{ opacity: [1, 0] }}
+              transition={{ repeat: Infinity, duration: 0.8 }}
+              className="inline-block w-1 h-8 bg-indigo-500" 
+            />
           </span>
-        </div>
+        </motion.div>
 
-        {/* Subtitle */}
-        <p className="max-w-xl mx-auto text-slate-400 text-base md:text-lg leading-relaxed mb-10">
-          I craft fast, scalable, and beautiful digital experiences — from sleek
-          frontends to powerful backends.
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
+        {/* CTA Section */}
+        <motion.div 
+          variants={itemVariants}
+          className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-12"
+        >
+          <motion.a
             href="#contact"
-            className="flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(99,102,241,0.4)" }}
+            whileTap={{ scale: 0.95 }}
+            className="group flex items-center gap-3 px-10 py-5 rounded-2xl bg-indigo-600 text-white font-black uppercase tracking-widest text-sm transition-all duration-300"
           >
-            <Mail size={18} />
-            Hire Me
-          </a>
-          <a
+            <Mail size={18} className="group-hover:rotate-12 transition-transform" />
+            Let's Talk
+          </motion.a>
+          
+          <motion.a
             href={cvFile}
             download="MUHAMMAD UZAIR.pdf"
-            className="flex items-center gap-2 px-8 py-3.5 rounded-full border border-slate-600 text-slate-300 font-semibold hover:border-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 transition-all duration-300"
+            whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.05)" }}
+            whileTap={{ scale: 0.95 }}
+            className="group flex items-center gap-3 px-10 py-5 rounded-2xl border-2 border-white/10 text-white font-black uppercase tracking-widest text-sm transition-all duration-300"
           >
-            <Download size={18} />
-            Download CV
-          </a>
-        </div>
-      </div>
+            <Download size={18} className="group-hover:-translate-y-1 transition-transform" />
+            Resume
+          </motion.a>
+        </motion.div>
+      </motion.div>
 
-      {/* ── Scroll indicator ── */}
-      <a
-        href="#about"
-        className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 text-slate-500 hover:text-indigo-400 transition-all duration-700 delay-1000 ${
-          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-        }`}
-      >
-        <span className="text-xs tracking-widest uppercase">Scroll</span>
-        <ChevronDown size={20} className="animate-bounce" />
-      </a>
+      {/* Floating Decorative Elements */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: [0.1, 0.3, 0.1],
+              y: [0, -100, 0],
+              x: [0, Math.random() * 50 - 25, 0]
+            }}
+            transition={{
+              duration: 10 + Math.random() * 10,
+              repeat: Infinity,
+              delay: Math.random() * 5
+            }}
+            className="absolute rounded-full bg-indigo-500/20"
+            style={{
+              width: Math.random() * 100 + 50,
+              height: Math.random() * 100 + 50,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              blur: "40px"
+            }}
+          />
+        ))}
+      </div>
     </section>
   );
 };
 
 export default HeroSection;
+

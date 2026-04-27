@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { 
   Database, 
   Layout, 
   Globe, 
   Terminal,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
 
 const skillCategories = [
@@ -13,95 +15,208 @@ const skillCategories = [
     title: "Frontend Development",
     icon: Layout,
     color: "from-blue-600 to-cyan-500",
+    glow: "rgba(59, 130, 246, 0.5)",
     skills: ["React.js", "Next.js 14", "TypeScript", "Tailwind CSS", "Framer Motion"]
   },
   {
     title: "Backend Engine",
     icon: Terminal,
     color: "from-purple-600 to-indigo-500",
+    glow: "rgba(139, 92, 246, 0.5)",
     skills: ["Node.js", "Express.js", "Socket.io", "REST APIs", "Knex.js"]
   },
   {
     title: "Database & Cloud",
     icon: Database,
     color: "from-emerald-500 to-teal-400",
+    glow: "rgba(16, 185, 129, 0.5)",
     skills: ["MongoDB", "PostgreSQL", "Firebase", "Amazon S3", "Redis"]
   },
   {
     title: "Mobile Solution",
     icon: Globe,
     color: "from-orange-500 to-rose-500",
+    glow: "rgba(249, 115, 22, 0.5)",
     skills: ["Flutter", "Dart", "Firebase Auth", "State Management", "Native APIs"]
   }
 ];
 
+const SkillCard = ({ category, index }) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseX = useSpring(x, { stiffness: 150, damping: 20 });
+  const mouseY = useSpring(y, { stiffness: 150, damping: 20 });
+
+  const rotateX = useTransform(mouseY, [-0.5, 0.5], [10, -10]);
+  const rotateY = useTransform(mouseX, [-0.5, 0.5], [-10, 10]);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseXPos = e.clientX - rect.left;
+    const mouseYPos = e.clientY - rect.top;
+    const xPct = (mouseXPos / width) - 0.5;
+    const yPct = (mouseYPos / height) - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, delay: index * 0.1 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ rotateX, rotateY, perspective: 1000 }}
+      className="relative group"
+    >
+      {/* Dynamic Glow Overlay */}
+      <motion.div
+        style={{
+          background: `radial-gradient(circle at var(--x) var(--y), ${category.glow}, transparent 80%)`,
+        }}
+        className="absolute -inset-0.5 rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl z-0"
+      />
+
+      <div className="relative p-8 rounded-[2rem] bg-slate-900/40 border border-white/5 backdrop-blur-xl overflow-hidden z-10 h-full flex flex-col group-hover:border-white/20 transition-colors duration-500">
+        {/* Floating Animation Wrapper */}
+        <motion.div
+          animate={{ y: [0, -10, 0] }}
+          transition={{
+            duration: 4 + index,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="flex flex-col h-full"
+        >
+          <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${category.color} flex items-center justify-center mb-8 shadow-2xl relative`}>
+             <div className="absolute inset-0 bg-white/20 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+            <category.icon className="w-8 h-8 text-white relative z-10" />
+          </div>
+
+          <h3 className="text-2xl font-black text-white mb-6 uppercase tracking-tighter italic">
+            {category.title}
+          </h3>
+
+          <ul className="space-y-4 flex-grow">
+            {category.skills.map((skill, si) => (
+              <motion.li 
+                key={si}
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 + (si * 0.1) }}
+                className="flex items-center gap-3 text-slate-400 group-hover:text-slate-200 transition-colors"
+              >
+                <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+                <span className="font-medium">{skill}</span>
+              </motion.li>
+            ))}
+          </ul>
+
+          <div className="mt-8 pt-6 border-t border-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+            <span className="text-[10px] uppercase tracking-[0.3em] font-black text-indigo-400 flex items-center gap-2">
+              <Sparkles size={12} className="animate-spin-slow" />
+              Expert Level
+            </span>
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+};
+
 const Skils = () => {
   const navigate = useNavigate();
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <section 
-      ref={sectionRef} 
-      className="bg-[#020817] py-24 px-6 relative overflow-hidden"
+      id="skills"
+      className="bg-[#020817] py-32 px-6 relative overflow-hidden"
     >
-      {/* Background decoration */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-        <div className="absolute top-1/4 right-0 w-96 h-96 bg-blue-600 rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-indigo-600 rounded-full blur-[120px]" />
+      {/* Advanced Animated Background */}
+      <div className="absolute inset-0 z-0">
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.1, 0.15, 0.1],
+          }}
+          transition={{ duration: 10, repeat: Infinity }}
+          className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" 
+        />
+        <motion.div 
+          animate={{ 
+            scale: [1.2, 1, 1.2],
+            opacity: [0.1, 0.15, 0.1],
+          }}
+          transition={{ duration: 12, repeat: Infinity }}
+          className="absolute bottom-1/4 -left-20 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" 
+        />
       </div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
-        <div className="text-center mb-16">
-          <h2 className={`text-4xl md:text-6xl font-black text-white mb-6 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
-            Technical <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Expertise</span>
-          </h2>
-          <div className={`w-24 h-1.5 bg-indigo-600 mx-auto rounded-full transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-0"}`} />
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-24">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="inline-block px-6 py-2 rounded-full bg-white/5 border border-white/10 text-indigo-400 text-xs font-bold uppercase tracking-[0.4em] mb-8"
+          >
+            Capabilities
+          </motion.div>
+          <motion.h2 
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter uppercase italic"
+          >
+            Technical <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">Expertise</span>
+          </motion.h2>
+          <motion.div 
+            initial={{ width: 0 }}
+            whileInView={{ width: "120px" }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="h-2 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full" 
+          />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+        {/* Skill Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24 perspective-1000">
           {skillCategories.map((category, index) => (
-            <div 
-              key={index}
-              style={{ transitionDelay: `${index * 150}ms` }}
-              className={`p-8 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-sm transition-all duration-700 hover:border-indigo-500/40 group ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-            >
-              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${category.color} flex items-center justify-center mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500`}>
-                <category.icon className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-6 tracking-tight">{category.title}</h3>
-              <ul className="space-y-4">
-                {category.skills.map((skill, si) => (
-                  <li key={si} className="flex items-center gap-3 text-slate-400 text-sm">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                    {skill}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <SkillCard key={index} category={category} index={index} />
           ))}
         </div>
 
-        <div className={`flex justify-center transition-all duration-1000 delay-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
-          <button 
+        {/* Magnetic Button Container */}
+        <div className="flex justify-center">
+          <motion.button 
             onClick={() => navigate("/expertises")}
-            className="group flex items-center gap-4 px-10 py-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-all shadow-xl shadow-indigo-600/20 active:scale-95"
+            whileHover={{ 
+              scale: 1.05,
+              backgroundColor: "rgba(79, 70, 229, 0.9)",
+              boxShadow: "0 20px 40px rgba(79, 70, 229, 0.4)"
+            }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="group relative flex items-center gap-6 px-12 py-6 rounded-3xl bg-indigo-600 text-white font-black uppercase tracking-[0.2em] text-sm overflow-hidden transition-all shadow-2xl"
           >
-            Explore More Expertise
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-          </button>
+            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            Explore Full Stack
+            <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-all duration-300" />
+          </motion.button>
         </div>
       </div>
     </section>
@@ -109,3 +224,4 @@ const Skils = () => {
 };
 
 export default Skils;
+

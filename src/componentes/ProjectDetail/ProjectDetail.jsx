@@ -66,7 +66,7 @@ const ProjectDetail = () => {
   })) || [];
 
   return (
-    <div className="min-h-screen bg-[#020817] bg-gradient-to-br from-slate-950 via-[#06091f] to-indigo-950 text-white pt-10 pb-20 font-sans">
+    <div className="min-h-screen bg-[#020817] bg-gradient-to-br from-slate-950 via-[#06091f] to-indigo-950 text-white pt-24 sm:pt-28 md:pt-32 lg:pt-14 pb-20 font-sans">
       {/* Glow blobs */}
       <div className="fixed top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="fixed bottom-1/4 right-1/4 w-80 h-80 bg-blue-700/10 rounded-full blur-[100px] pointer-events-none" />
