@@ -1,84 +1,95 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import profileImg from "../../../assets/my image/uzair_image.png";
 
+/* ── Variants ─────────────────────────── */
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.18 },
+  },
+};
+
+const itemVariants = {
+  hidden: { x: -60, opacity: 0 },
+  visible: {
+    x: 0,
+    opacity: 1,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const imageVariants = {
+  hidden: { x: 60, opacity: 0, scale: 0.85 },
+  visible: {
+    x: 0,
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.3 },
+  },
+};
+
 const About = () => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
+  /* Each ref tracks its own element — once:false retriggers on every scroll */
+  const titleRef = useRef(null);
+  const textRef = useRef(null);
+  const imageRef = useRef(null);
 
-  const itemVariants = {
-    hidden: { x: -50, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut",
-      },
-    },
-  };
-
-  const imageVariants = {
-    hidden: { x: 50, opacity: 0, scale: 0.8 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 1,
-        ease: "easeOut",
-        delay: 0.4,
-      },
-    },
-  };
+  const titleInView = useInView(titleRef, { once: false, margin: "-80px" });
+  const textInView  = useInView(textRef,  { once: false, margin: "-80px" });
+  const imageInView = useInView(imageRef, { once: false, margin: "-80px" });
 
   return (
     <section
       id="about"
       className="min-h-screen bg-[#020817] bg-gradient-to-br from-slate-950 via-[#06091f] to-indigo-950 py-24 px-6 md:px-12 lg:px-24 overflow-hidden relative"
     >
-      {/* Background Decorative Blobs */}
+      {/* Background blobs */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-blue-600/10 rounded-full blur-[100px] animate-blob pointer-events-none" />
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-600/10 rounded-full blur-[120px] animate-blob [animation-delay:2s] pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Title */}
         <motion.h2
-          initial={{ y: 30, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          ref={titleRef}
+          variants={{
+            hidden:  { y: 40, opacity: 0 },
+            visible: { y: 0,  opacity: 1, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } },
+          }}
+          initial="hidden"
+          animate={titleInView ? "visible" : "hidden"}
           className="text-4xl md:text-6xl font-black mb-16 tracking-tight"
         >
           <span className="text-white">ABOUT</span>
           <span className="text-blue-500"> ME</span>
-          <div className="h-1.5 w-24 bg-blue-600 mt-4 rounded-full" />
+          <motion.div
+            initial={{ width: 0 }}
+            animate={titleInView ? { width: "6rem" } : { width: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+            className="h-1.5 bg-blue-600 mt-4 rounded-full"
+          />
         </motion.h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Text Content */}
           <motion.div
+            ref={textRef}
             variants={containerVariants}
             initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            animate={textInView ? "visible" : "hidden"}
             className="space-y-8"
           >
             <motion.p variants={itemVariants} className="text-xl md:text-2xl text-slate-300 font-medium leading-relaxed">
-              I'm <span className="text-blue-400 font-bold border-b-2 border-blue-400/30">Muhammad Uzair</span>, 
-              a Full-Stack Developer with over <span className="text-white font-bold">4 years</span> of experience 
+              I'm <span className="text-blue-400 font-bold border-b-2 border-blue-400/30">Muhammad Uzair</span>,{" "}
+              a Full-Stack Developer with over <span className="text-white font-bold">4 years</span> of experience
               crafting high-performance digital experiences.
             </motion.p>
 
             <motion.p variants={itemVariants} className="text-lg text-slate-400 leading-relaxed">
-              Specializing in the <span className="text-indigo-300 font-semibold text-white/90">MERN stack</span> and <span className="text-blue-300 font-semibold text-white/90">Flutter</span>, 
+              Specializing in the{" "}
+              <span className="text-indigo-300 font-semibold text-white/90">MERN stack</span> and{" "}
+              <span className="text-blue-300 font-semibold text-white/90">Flutter</span>,
               I build scalable backend systems and fluid mobile applications that solve real-world problems.
             </motion.p>
 
@@ -102,20 +113,17 @@ const About = () => {
             </motion.div>
           </motion.div>
 
-          {/* Image Content */}
+          {/* Image */}
           <motion.div
+            ref={imageRef}
             variants={imageVariants}
             initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
+            animate={imageInView ? "visible" : "hidden"}
             className="flex justify-center lg:justify-end"
           >
             <div className="relative w-72 h-72 md:w-96 md:h-96 group animate-float">
-              {/* Outer Glows */}
               <div className="absolute -inset-4 rounded-full bg-blue-500/20 blur-2xl group-hover:bg-blue-500/30 transition-all duration-700" />
               <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 opacity-50 blur-md group-hover:opacity-80 animate-pulse" />
-
-              {/* Main Image Container */}
               <div className="relative w-full h-full rounded-full border-4 border-white/10 overflow-hidden shadow-2xl z-10">
                 <img
                   src={profileImg}
@@ -125,8 +133,6 @@ const About = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
-
-              {/* Decorative Elements */}
               <div className="absolute -top-4 -left-4 w-24 h-24 bg-indigo-600/20 rounded-full blur-xl animate-pulse" />
               <div className="absolute -bottom-6 -right-6 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black italic tracking-tighter shadow-xl z-20 transform -rotate-6 border-b-4 border-blue-800">
                 DEVELOPER
@@ -140,4 +146,3 @@ const About = () => {
 };
 
 export default About;
-

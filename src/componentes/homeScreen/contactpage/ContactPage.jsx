@@ -1,6 +1,7 @@
 import { Button, Input, Textarea } from "@material-tailwind/react";
 import React, { useState } from "react";
 import ConnectionModal from "../../../common/modal/ConnectionModal";
+import NotificationToast from "../../../common/modal/NotificationToast";
 import { sendWhatsAppMessage, sendEmailMessage } from "../../../pages/contact/contactService";
 
 export default function ContactPage() {
@@ -13,6 +14,10 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [toast, setToast] = useState({ isOpen: false, type: "success", message: "" });
+
+  const showToast = (type, message) => setToast({ isOpen: true, type, message });
+  const closeToast = () => setToast((prev) => ({ ...prev, isOpen: false }));
 
   // Handle Input Changes
   const handleChange = (e) => {
@@ -44,10 +49,10 @@ export default function ContactPage() {
     } else if (option === "email") {
       const result = await sendEmailMessage(formData);
       if (result.success) {
-        alert("Email sent successfully!");
+        showToast("success", "Email sent successfully!");
         setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
       } else {
-        alert("Failed to send email. Please try WhatsApp.");
+        showToast("error", "Failed to send email. Please try WhatsApp.");
       }
       setIsSubmitting(false);
     }
@@ -223,6 +228,13 @@ export default function ContactPage() {
         onClose={() => setIsModalOpen(false)}
         onOptionSelect={handleOptionSelect}
         formData={formData}
+      />
+
+      <NotificationToast
+        isOpen={toast.isOpen}
+        type={toast.type}
+        message={toast.message}
+        onClose={closeToast}
       />
     </main>
   );
